@@ -11,3 +11,23 @@ config:
     human_review: 0.70
   language: "fr"
   regulator: "ACPR"
+
+
+Layer 4: Guardrails & Governance
+Every decision the AI makes gets logged, explained, and constrained. This is non-negotiable in banking.
+	∙	Audit trail of every decision
+	∙	Confidence scores on every output
+	∙	Human-in-the-loop triggers when confidence is low
+	∙	Explainability — why did the AI make this decision?
+	∙	Regulatory compliance checks (EU AI Act, DORA)
+Layer 5: Orchestration Interface
+This is how blocks connect to each other to form workflows. One block’s output becomes another block’s input.
+
+Payment File Received
+    → [Format Detection Block]
+    → [Format Conversion Block]
+    → [Sanctions Screening Block]
+    → [Fraud Detection Block]
+    → [Reconciliation Block]
+    → Payment Processed
+
