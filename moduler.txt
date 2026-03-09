@@ -1,3 +1,636 @@
+import { useState } from “react”;
+
+const categories = [
+{
+id: “compliance”,
+title: “Compliance & Regulatory”,
+icon: “🛡️”,
+color: “#0D4F4F”,
+accent: “#14B8A6”,
+blocks: [
+{
+name: “KYC/AML Agent”,
+status: “production”,
+description: “End-to-end Know Your Customer and Anti-Money Laundering automation — document extraction, sanctions screening, risk scoring, and audit trail generation.”,
+who: “McKinsey reports 200–2,000% productivity gains. Dutch bank achieved 90% reduction in onboarding time. HSBC, BNP Paribas, Standard Chartered in production.”,
+reusable: “High — KYC rules are standardized (EU AMLD6, FinCEN). Config: risk thresholds, sanctions lists, local regulatory mapping.”,
+sepa: “Critical for SEPA Instant — must screen within 10-second settlement window. French ICS creditor verification prevents SEPA fraud.”
+},
+{
+name: “Regulatory Reporting Agent”,
+status: “production”,
+description: “Automated generation of regulatory reports (COREP, FINREP, SARs, CCAR). Data aggregation, validation, formatting, and submission-ready output.”,
+who: “Major US and EU banks. AgentFlow offers prebuilt templates for FDIC, OCC, FFIEC. Kognitos automates SAR generation.”,
+reusable: “Medium-High — report templates are standardized per jurisdiction. Config: report type, data sources, submission format, local regulator (ACPR for France).”,
+sepa: “IPR (Instant Payments Regulation) mandates specific reporting. DORA requires incident reporting within hours.”
+},
+{
+name: “Regulatory Circular Analyzer”,
+status: “emerging”,
+description: “AI agents auto-ingest regulatory circulars (PDFs, notifications) the moment they’re published, extract provisions, map to affected business areas, and generate impact assessments.”,
+who: “Ampcome reports banks reducing circular analysis from 2–3 weeks to 24 hours. Early adopters in EU and US compliance teams.”,
+reusable: “High — NLP parsing is universal. Config: regulator feeds (ACPR, ECB, EBA), internal product mapping, escalation rules.”,
+sepa: “EPC rulebook updates, ECB guidelines on SCT Inst, and EU AI Act provisions require continuous monitoring.”
+},
+{
+name: “Transaction Monitoring Agent”,
+status: “production”,
+description: “Continuous real-time monitoring of transactions for suspicious patterns, structuring behavior, and cross-account anomalies. Replaces static rule-based systems.”,
+who: “HSBC AI-driven AML system. Banks report ~40% higher anomaly-detection accuracy. False positive reduction of up to 70%.”,
+reusable: “High — monitoring logic is pattern-based. Config: risk models, threshold parameters, currency/geography rules, escalation workflows.”,
+sepa: “Essential for SCT Inst real-time fraud detection. France seeing sharp rise in SEPA Direct Debit fraud via falsified ICS credentials.”
+}
+]
+},
+{
+id: “payments”,
+title: “Payments & SEPA”,
+icon: “💸”,
+color: “#1E3A5F”,
+accent: “#3B82F6”,
+blocks: [
+{
+name: “SEPA Format Converter”,
+status: “production”,
+description: “Intelligent conversion between ISO 20022 XML formats — pain.001, pain.008, camt.053, MT940, CFONB (French legacy). Auto-detection, validation, and error correction.”,
+who: “Iberpay offers conversion services for Spanish banks. JAM Software’s SEPA-Transfer. Commerzbank migration tools. Most banks building internally.”,
+reusable: “Very High — ISO 20022 is a universal standard. Config: source/target format versions, bank-specific field mappings, CFONB variants for French banks.”,
+sepa: “Core need — ISO 20022 migration deadline is Nov 2026. Pain version upgrades, MT-to-CAMT migration, structured address conversion all required.”
+},
+{
+name: “Real-Time Sanctions Screening”,
+status: “production”,
+description: “Sub-10-second screening of SEPA Instant payments against sanctions lists (EU, OFAC, UN). Risk-based decisioning with configurable thresholds.”,
+who: “Castellum.AI, Stripe Radar (42% SEPA fraud reduction). Banks adopting behavioral intelligence for real-time screening.”,
+reusable: “Very High — sanctions lists are global. Config: list selection, risk tiers, customer scoring, timeout handling, fallback rules.”,
+sepa: “Non-negotiable for SCT Inst. EU sanctions regulations apply equally to instant and traditional payments. Must process within 10-second window.”
+},
+{
+name: “Payment Reconciliation Agent”,
+status: “production”,
+description: “Auto-matching of CAMT.053 bank statements against internal ledgers. AI confidence scoring, exception handling, and journal entry preparation.”,
+who: “Appinventiv reports banks deploying AI reconciliation. Deloitte CFO research shows finance leaders prioritizing this. ChatFin building AI finance platforms.”,
+reusable: “High — reconciliation logic is universal. Config: ERP connectors (SAP, Oracle), ledger format, tolerance thresholds, exception routing.”,
+sepa: “CAMT.053 replaces MT940 for SEPA reporting. Real-time reconciliation needed for instant payment visibility.”
+},
+{
+name: “SEPA Fraud Detection Block”,
+status: “emerging”,
+description: “Behavioral intelligence to detect SEPA Direct Debit fraud — fake ICS credentials, suspicious debit patterns, mule account detection, and cash-out blocking.”,
+who: “BioCatch leading behavioral intelligence for French SEPA fraud. Stripe Radar for SEPA. Banks building internal solutions.”,
+reusable: “High — fraud patterns are cross-bank. Config: behavioral baselines, ICS verification rules, IBAN watchlists, velocity limits.”,
+sepa: “France-specific urgent need. Criminals exploiting ICS approval process with falsified KBIS documents. Pull-payment model lacks strong authentication.”
+}
+]
+},
+{
+id: “lending”,
+title: “Credit & Lending”,
+icon: “🏦”,
+color: “#4A1942”,
+accent: “#A855F7”,
+blocks: [
+{
+name: “Credit Underwriting Agent”,
+status: “production”,
+description: “End-to-end loan processing — document ingestion, income verification, credit scoring, policy compliance, and risk assessment with explainable decisions.”,
+who: “AWS Bedrock Agents for mortgage automation. US bank achieved 20–60% productivity increase and 30% faster credit turnaround. 10–15% fewer defaults reported.”,
+reusable: “Medium — credit policies vary by bank. Config: underwriting rules, risk models, product types, regulatory requirements (EU AI Act flags credit scoring as high-risk).”,
+sepa: “Indirect — SEPA payment history data feeds credit decisioning. IBAN verification for disbursement.”
+},
+{
+name: “Loan Origination Workflow”,
+status: “production”,
+description: “Automates full lifecycle — document validation (pay stubs, tax returns), credit checks, compliance verification, and loan file preparation for underwriter review.”,
+who: “N-iX implemented for MENA bank. nCino excels in commercial lending with AI credit decisioning. Capital One using AI for faster approvals.”,
+reusable: “Medium-High — document types and checks are standard. Config: product rules, document requirements, approval thresholds, local regulations.”,
+sepa: “SEPA Direct Debit mandates used for loan repayment collection. Format compliance needed for recurring payments.”
+},
+{
+name: “Credit Risk Memo Generator”,
+status: “production”,
+description: “AI-generated credit risk memos with automated data aggregation, financial analysis, risk factor identification, and structured report output.”,
+who: “McKinsey reports a US bank achieved 20–60% productivity increase using AI for credit risk memos. Hebbia and Claude Finance used for financial analysis.”,
+reusable: “High — memo structure is standardized. Config: internal templates, risk framework, data sources, approval workflows.”,
+sepa: “Indirect — payment behavior data from SEPA transactions enriches risk assessment.”
+}
+]
+},
+{
+id: “documents”,
+title: “Document & Data Processing”,
+icon: “📄”,
+color: “#5C2D0E”,
+accent: “#F59E0B”,
+blocks: [
+{
+name: “Document Classification & Routing”,
+status: “production”,
+description: “AI scans incoming documents, identifies purpose/intent, determines sender type (individual vs institution), recognizes emotional tone, and routes to correct department.”,
+who: “Crédit Agricole Bank Polska — 50% faster processing, 750+ hours/month saved. Deployed via Deviniti’s AI Agent. Auto-executes simple instructions.”,
+reusable: “Very High — document types are common across banks. Config: department taxonomy, routing rules, priority levels, auto-execution permissions.”,
+sepa: “Handles SEPA-related correspondence — mandate disputes, payment inquiries, ICS applications.”
+},
+{
+name: “Trade Finance Document Agent”,
+status: “emerging”,
+description: “Processes letters of credit, bills of lading, invoices, and certificates of origin. Cross-validates documents, checks compliance, and flags discrepancies.”,
+who: “Standard Chartered exploring AI for trade finance. Crédit Agricole CIB is a pioneer in eTrade. JP Morgan using AI for trade document processing.”,
+reusable: “High — trade finance documents follow ICC standards (UCP 600). Config: product-specific rules, counterparty databases, compliance checklists.”,
+sepa: “Connected via Receivable & Supply Chain Finance flows. SEPA credit transfers used for trade settlement.”
+},
+{
+name: “Intelligent Document Processing (IDP)”,
+status: “production”,
+description: “Extract structured and unstructured data from PDFs, images, forms. OCR, NLP, and entity recognition for financial documents at scale.”,
+who: “NVIDIA NIM offers IDP for financial services. Google Cloud Document AI. Banks deploying across loan docs, compliance files, customer correspondence.”,
+reusable: “Very High — extraction logic is model-based. Config: document templates, field mappings, validation rules, output format.”,
+sepa: “Processes SEPA mandate forms, payment instructions, bank statements, and regulatory filings.”
+}
+]
+},
+{
+id: “customer”,
+title: “Customer Experience”,
+icon: “👤”,
+color: “#1A3C34”,
+accent: “#10B981”,
+blocks: [
+{
+name: “Customer Onboarding Orchestrator”,
+status: “production”,
+description: “End-to-end journey from application through KYC checks, account setup in core banking, and welcome communication. Handles identity verification, document validation, and risk scoring.”,
+who: “Backbase AI-powered platform for 150+ institutions. Kore.ai Banking suite. By 2026, projected 70% of new account onboarding fully automated.”,
+reusable: “High — onboarding steps are universal. Config: core banking connectors (Temenos, Finacle, FIS), product catalog, identity providers, local ID requirements.”,
+sepa: “IBAN provisioning, SEPA mandate setup, and instant payment enablement are part of the onboarding flow.”
+},
+{
+name: “AI Customer Service Agent”,
+status: “production”,
+description: “Multi-channel conversational AI handling balance inquiries, transfers, disputes, card management, and FAQ. Escalates complex cases with full context.”,
+who: “Nordea — 220K+ monthly conversations, 90%+ resolution rate via Boost.ai. Capital One’s Eno. RBS Cora (40K queries/day). BNY Mellon’s Eliza (13 specialized agents).”,
+reusable: “Very High — banking intents are universal. Config: product catalog, channel integrations, language, tone, escalation rules.”,
+sepa: “Handles SEPA payment status inquiries, mandate disputes, instant payment confirmations.”
+},
+{
+name: “Chargeback & Dispute Agent”,
+status: “emerging”,
+description: “End-to-end dispute processing — evidence gathering, network rule application (Visa/Mastercard), credit/debit processing, and case resolution.”,
+who: “Stripe Smart Disputes (AI-powered evidence compilation). Banks automating dispute workflows. Kognitos building end-to-end dispute agents.”,
+reusable: “High — dispute rules follow card network standards. Config: network rules, evidence templates, SLA timers, refund policies.”,
+sepa: “SEPA Direct Debit disputes follow specific EPC rules — 8-week unconditional refund right, 13-month disputed refund window.”
+}
+]
+},
+{
+id: “risk”,
+title: “Risk & Treasury”,
+icon: “📊”,
+color: “#3B0A0A”,
+accent: “#EF4444”,
+blocks: [
+{
+name: “Risk Assessment Platform”,
+status: “production”,
+description: “ML-powered credit, market, and operational risk evaluation. Ingests large datasets to predict defaults and financial instabilities with explainable outputs.”,
+who: “BNP Paribas — AI risk assessment platform analyzing multiple risk factors. Banks report ~40% higher anomaly-detection accuracy.”,
+reusable: “Medium — risk models are bank-specific but frameworks are standard. Config: risk factors, model parameters, Basel III/IV requirements, stress test scenarios.”,
+sepa: “Payment flow data from SEPA transactions feeds liquidity and counterparty risk models.”
+},
+{
+name: “Treasury & Liquidity Agent”,
+status: “emerging”,
+description: “Real-time cash positioning, fund allocation, predictive cash flow forecasting, and automated liquidity management across accounts and currencies.”,
+who: “Workday and Oracle building treasury AI. Banks piloting for real-time liquidity. API-led treasury becoming standard for 2026.”,
+reusable: “Medium-High — treasury operations follow standard patterns. Config: account structure, currency pairs, investment policies, regulatory limits.”,
+sepa: “SEPA Instant impacts real-time liquidity. 24/7/365 processing changes cash management dynamics. Wero (A2A payments) adds new settlement flows.”
+},
+{
+name: “Fraud Alert Triage Agent”,
+status: “production”,
+description: “Enriches each fraud alert with customer history, transaction context, device intelligence, and behavioral patterns. Auto-closes false positives with documented reasoning.”,
+who: “Banks report AI cutting false positives by up to 70%. Stripe Radar users see 42% SEPA fraud reduction. Industry deploying at scale.”,
+reusable: “High — triage logic is pattern-based. Config: risk scoring models, auto-close thresholds, escalation queues, human review triggers.”,
+sepa: “Real-time triage essential for instant payments. Must balance fraud prevention with <10-second processing requirement.”
+}
+]
+},
+{
+id: “internal”,
+title: “Internal Operations”,
+icon: “⚙️”,
+color: “#1F2937”,
+accent: “#6B7280”,
+blocks: [
+{
+name: “Month-End Close Agent”,
+status: “emerging”,
+description: “Automates reconciliations (including intercompany and bank), pulls data from multiple sources, identifies discrepancies, and prepares journal entries for the general ledger.”,
+who: “PwC reports AI can reduce cycle times by up to 80% for PO processing. Kognitos building end-to-end close automation. Enterprise adoption growing.”,
+reusable: “High — close processes follow accounting standards. Config: chart of accounts, subledger connectors, reconciliation rules, approval workflows.”,
+sepa: “Bank statement reconciliation (CAMT.053) is a core input to the close process.”
+},
+{
+name: “IT User Access Review Agent”,
+status: “emerging”,
+description: “Automates user access reviews — pulls user lists from applications, routes to managers for certification, tracks responses, revokes unauthorized access.”,
+who: “Early adopters in banking IT governance. DORA requirements driving automation. Banks building internally for SOX compliance.”,
+reusable: “Very High — access review is a universal IT governance process. Config: application inventory, role definitions, certification workflows, SOX controls.”,
+sepa: “DORA mandates ICT risk management including access controls for payment systems.”
+},
+{
+name: “Code Quality & Modernization Agent”,
+status: “production”,
+description: “AI-assisted code review, legacy modernization, and automated testing. Analyzes legacy systems, extracts business rules, and generates documentation.”,
+who: “Crédit Agricole Payment Services using AI for test automation. GitHub Copilot adoption across banks. Persistent Systems using agentic AI for legacy modernization.”,
+reusable: “High — code patterns are universal. Config: language/framework targets, coding standards, CI/CD pipelines, security scanning rules.”,
+sepa: “Modernizing legacy SEPA processing systems. CFONB-to-ISO 20022 codebase migration.”
+}
+]
+},
+{
+id: “wealth”,
+title: “Wealth & Advisory”,
+icon: “💎”,
+color: “#1E293B”,
+accent: “#8B5CF6”,
+blocks: [
+{
+name: “Portfolio Intelligence Agent”,
+status: “emerging”,
+description: “Consolidates performance data, allocation shifts, compliance checks into client-ready summaries. Highlights concentration risks and prepares contextual notes for advisor review.”,
+who: “Backbase live on their platform for RM preparation. Wealth management agents cutting advisor prep from days to minutes.”,
+reusable: “Medium — investment products vary. Config: asset classes, compliance rules, client segmentation, report templates.”,
+sepa: “SEPA payment data feeds into client activity analysis and cash flow monitoring.”
+},
+{
+name: “RM Meeting Preparation Agent”,
+status: “production”,
+description: “Surfaces client-specific insights, recent transactions, market data, product usage, and personal context (family, life events) for relationship manager preparation.”,
+who: “Backbase — live on platform. Banks using AI assistants for RM prep. PwC reports AI transforming front-office productivity.”,
+reusable: “High — RM preparation follows standard patterns. Config: CRM connectors, data sources, insight templates, compliance filters.”,
+sepa: “Client SEPA transaction history, mandate information, and payment patterns inform advisory conversations.”
+},
+{
+name: “Personalized Financial Advisor”,
+status: “emerging”,
+description: “AI-driven hyper-personalized guidance — analyzes income, spending, goals, and risk tolerance to craft bespoke financial plans. Proactive suggestions for optimization.”,
+who: “Santander AI-driven personalization. Capital One using AI for spending insights. Ant Group’s Zhima Credit evaluates 3,000+ variables.”,
+reusable: “Medium — advice rules vary by jurisdiction. Config: product catalog, regulatory suitability rules, risk profiling, local tax implications.”,
+sepa: “SEPA transaction data is primary input for spending analysis and cash flow forecasting.”
+}
+]
+}
+];
+
+const statusColors = {
+production: { bg: “#059669”, text: “#ECFDF5”, label: “In Production” },
+emerging: { bg: “#D97706”, text: “#FFFBEB”, label: “Emerging / Pilot” }
+};
+
+export default function ReusableAIBlocksDashboard() {
+const [selectedCategory, setSelectedCategory] = useState(null);
+const [selectedBlock, setSelectedBlock] = useState(null);
+const [filter, setFilter] = useState(“all”);
+
+const totalBlocks = categories.reduce((sum, c) => sum + c.blocks.length, 0);
+const productionBlocks = categories.reduce(
+(sum, c) => sum + c.blocks.filter((b) => b.status === “production”).length,
+0
+);
+const emergingBlocks = totalBlocks - productionBlocks;
+
+const filteredCategories = categories.map((cat) => ({
+…cat,
+blocks: cat.blocks.filter((b) => filter === “all” || b.status === filter)
+})).filter((cat) => cat.blocks.length > 0);
+
+return (
+<div style={{
+fontFamily: “‘Instrument Serif’, ‘Georgia’, serif”,
+background: “#0A0A0F”,
+color: “#E8E6E1”,
+minHeight: “100vh”,
+padding: “2rem 1.5rem”
+}}>
+{/* Header */}
+<div style={{ maxWidth: 1100, margin: “0 auto” }}>
+<div style={{
+borderBottom: “1px solid rgba(255,255,255,0.08)”,
+paddingBottom: “1.5rem”,
+marginBottom: “2rem”
+}}>
+<p style={{
+fontFamily: “‘SF Mono’, ‘Fira Code’, monospace”,
+fontSize: “0.7rem”,
+letterSpacing: “0.2em”,
+textTransform: “uppercase”,
+color: “#6B7280”,
+marginBottom: “0.5rem”
+}}>
+Banking AI Landscape — March 2026
+</p>
+<h1 style={{
+fontSize: “clamp(1.8rem, 4vw, 2.8rem)”,
+fontWeight: 400,
+lineHeight: 1.1,
+margin: “0 0 0.75rem 0”,
+background: “linear-gradient(135deg, #E8E6E1 0%, #9CA3AF 100%)”,
+WebkitBackgroundClip: “text”,
+WebkitTextFillColor: “transparent”
+}}>
+Reusable AI Blocks for Banking
+</h1>
+<p style={{
+fontFamily: “‘SF Mono’, monospace”,
+fontSize: “0.85rem”,
+color: “#9CA3AF”,
+maxWidth: 700,
+lineHeight: 1.6
+}}>
+A comprehensive map of {totalBlocks} modular AI blocks across {categories.length} domains — currently deployed or emerging in production at global banks, with SEPA/Paris relevance.
+</p>
+</div>
+
+```
+    {/* Stats Row */}
+    <div style={{
+      display: "flex",
+      gap: "1rem",
+      marginBottom: "1.5rem",
+      flexWrap: "wrap"
+    }}>
+      {[
+        { label: "Total Blocks", value: totalBlocks, color: "#E8E6E1" },
+        { label: "In Production", value: productionBlocks, color: "#059669" },
+        { label: "Emerging / Pilot", value: emergingBlocks, color: "#D97706" },
+        { label: "Categories", value: categories.length, color: "#3B82F6" }
+      ].map((stat) => (
+        <div key={stat.label} style={{
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: 8,
+          padding: "0.75rem 1.25rem",
+          minWidth: 120
+        }}>
+          <div style={{
+            fontFamily: "'SF Mono', monospace",
+            fontSize: "1.5rem",
+            fontWeight: 600,
+            color: stat.color
+          }}>
+            {stat.value}
+          </div>
+          <div style={{
+            fontFamily: "'SF Mono', monospace",
+            fontSize: "0.65rem",
+            color: "#6B7280",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase"
+          }}>
+            {stat.label}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Filter */}
+    <div style={{
+      display: "flex",
+      gap: "0.5rem",
+      marginBottom: "2rem"
+    }}>
+      {[
+        { key: "all", label: "All Blocks" },
+        { key: "production", label: "Production Only" },
+        { key: "emerging", label: "Emerging Only" }
+      ].map((f) => (
+        <button
+          key={f.key}
+          onClick={() => { setFilter(f.key); setSelectedBlock(null); }}
+          style={{
+            fontFamily: "'SF Mono', monospace",
+            fontSize: "0.7rem",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            padding: "0.4rem 0.9rem",
+            borderRadius: 4,
+            border: filter === f.key ? "1px solid rgba(255,255,255,0.3)" : "1px solid rgba(255,255,255,0.08)",
+            background: filter === f.key ? "rgba(255,255,255,0.08)" : "transparent",
+            color: filter === f.key ? "#E8E6E1" : "#6B7280",
+            cursor: "pointer",
+            transition: "all 0.2s"
+          }}
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+
+    {/* Main Grid */}
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+      {filteredCategories.map((cat) => (
+        <div key={cat.id} style={{
+          background: "rgba(255,255,255,0.02)",
+          border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: 12,
+          overflow: "hidden"
+        }}>
+          {/* Category Header */}
+          <div
+            onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+            style={{
+              padding: "1rem 1.25rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              cursor: "pointer",
+              borderBottom: selectedCategory === cat.id ? "1px solid rgba(255,255,255,0.06)" : "none",
+              transition: "background 0.2s",
+              background: selectedCategory === cat.id ? "rgba(255,255,255,0.03)" : "transparent"
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span style={{ fontSize: "1.3rem" }}>{cat.icon}</span>
+              <div>
+                <h2 style={{
+                  fontSize: "1.1rem",
+                  fontWeight: 400,
+                  margin: 0,
+                  color: "#E8E6E1"
+                }}>
+                  {cat.title}
+                </h2>
+                <span style={{
+                  fontFamily: "'SF Mono', monospace",
+                  fontSize: "0.65rem",
+                  color: "#6B7280"
+                }}>
+                  {cat.blocks.length} block{cat.blocks.length !== 1 ? "s" : ""}
+                  {" · "}
+                  {cat.blocks.filter(b => b.status === "production").length} production
+                </span>
+              </div>
+            </div>
+            <span style={{
+              color: "#6B7280",
+              fontSize: "1rem",
+              transform: selectedCategory === cat.id ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.3s"
+            }}>
+              ▼
+            </span>
+          </div>
+
+          {/* Blocks List - Always show names, expand on category click */}
+          {selectedCategory === cat.id && (
+            <div style={{ padding: "0.75rem" }}>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                gap: "0.75rem"
+              }}>
+                {cat.blocks.map((block) => {
+                  const isSelected = selectedBlock?.name === block.name;
+                  const st = statusColors[block.status];
+                  return (
+                    <div
+                      key={block.name}
+                      onClick={() => setSelectedBlock(isSelected ? null : block)}
+                      style={{
+                        background: isSelected ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.02)",
+                        border: isSelected
+                          ? `1px solid ${cat.accent}40`
+                          : "1px solid rgba(255,255,255,0.04)",
+                        borderRadius: 8,
+                        padding: "1rem",
+                        cursor: "pointer",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      <div style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "space-between",
+                        marginBottom: "0.5rem"
+                      }}>
+                        <h3 style={{
+                          fontSize: "0.95rem",
+                          fontWeight: 400,
+                          margin: 0,
+                          color: "#E8E6E1",
+                          lineHeight: 1.3
+                        }}>
+                          {block.name}
+                        </h3>
+                        <span style={{
+                          fontFamily: "'SF Mono', monospace",
+                          fontSize: "0.55rem",
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          padding: "0.2rem 0.5rem",
+                          borderRadius: 3,
+                          background: st.bg + "20",
+                          color: st.bg === "#059669" ? "#34D399" : "#FBBF24",
+                          whiteSpace: "nowrap",
+                          flexShrink: 0,
+                          marginLeft: "0.5rem"
+                        }}>
+                          {st.label}
+                        </span>
+                      </div>
+
+                      <p style={{
+                        fontFamily: "'SF Mono', monospace",
+                        fontSize: "0.72rem",
+                        color: "#9CA3AF",
+                        lineHeight: 1.5,
+                        margin: "0 0 0.75rem 0"
+                      }}>
+                        {block.description}
+                      </p>
+
+                      {isSelected && (
+                        <div style={{
+                          borderTop: "1px solid rgba(255,255,255,0.06)",
+                          paddingTop: "0.75rem",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "0.6rem"
+                        }}>
+                          {[
+                            { label: "Who's Using It", text: block.who, color: "#3B82F6" },
+                            { label: "Reusability", text: block.reusable, color: "#10B981" },
+                            { label: "SEPA / Paris Relevance", text: block.sepa, color: "#F59E0B" }
+                          ].map((detail) => (
+                            <div key={detail.label}>
+                              <div style={{
+                                fontFamily: "'SF Mono', monospace",
+                                fontSize: "0.6rem",
+                                letterSpacing: "0.15em",
+                                textTransform: "uppercase",
+                                color: detail.color,
+                                marginBottom: "0.2rem"
+                              }}>
+                                {detail.label}
+                              </div>
+                              <div style={{
+                                fontFamily: "'SF Mono', monospace",
+                                fontSize: "0.7rem",
+                                color: "#D1D5DB",
+                                lineHeight: 1.5
+                              }}>
+                                {detail.text}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+
+    {/* Footer Summary */}
+    <div style={{
+      marginTop: "2.5rem",
+      borderTop: "1px solid rgba(255,255,255,0.06)",
+      paddingTop: "1.5rem"
+    }}>
+      <h2 style={{ fontSize: "1.2rem", fontWeight: 400, marginBottom: "1rem" }}>
+        Key Sources & Evidence
+      </h2>
+      <div style={{
+        fontFamily: "'SF Mono', monospace",
+        fontSize: "0.7rem",
+        color: "#6B7280",
+        lineHeight: 1.8,
+        columns: "2 300px",
+        columnGap: "2rem"
+      }}>
+        <p>McKinsey — 50 largest banks announced 160+ AI use cases in 2025. Agentic AI delivers 200–2,000% productivity gains in KYC/AML.</p>
+        <p>KPMG — Global agentic AI market spend estimated at $50B in 2025. Companies earn $3.50 for every $1 invested.</p>
+        <p>Backbase — First AI-native banking platform (2025). 150+ financial institutions. Four specialized AI fabrics.</p>
+        <p>Crédit Agricole — AI Factory delivered 100+ use cases. Bank Polska cut doc processing 50%. CA-GIP runs enterprise automation.</p>
+        <p>CIBC — Reduced capital markets workflow from 10–13 hrs to ~10 min using reusable AI frameworks on Azure.</p>
+        <p>NVIDIA NIM — Containerized AI microservices for financial services. IDP, fraud, chatbots, earnings analysis.</p>
+        <p>Workday — AI agent market in financial services expected to grow 815% between 2025–2030.</p>
+        <p>Oracle — 2026 vision: composable cores with pluggable AI agents, reusable blueprints and guardrails.</p>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+);
+}
+
+
 Yes, it is absolutely possible! In fact, creating reusable AI "blocks" (often called modular microservices or agentic workflows) is exactly where the smartest players in the financial sector are heading right now. It’s highly inefficient for a bank to build a new AI tool from scratch for every single department when they all share the exact same core needs.
 Since you asked to tailor this to a "Paris bank," let's look directly at BNP Paribas—headquartered in Paris and one of the largest financial institutions globally. They are actively doing exactly what you are envisioning: moving away from isolated experiments and building foundational, reusable AI models (in partnership with companies like Mistral AI) that can be deployed across hundreds of different use cases with just a little customization.
 Here is how your idea of reusable AI blocks maps directly to what is happening in the real world of Paris banking:
