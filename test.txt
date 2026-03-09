@@ -31,3 +31,9 @@ Payment File Received
     → [Reconciliation Block]
     → Payment Processed
 
+The Business Model
+There are three ways to deliver reusable AI blocks:
+1. Platform Model (Backbase, Temenos approach) — You build a platform with a library of blocks. Banks subscribe and configure. Highest revenue, hardest to build.
+2. Accelerator Model (Neurons Lab approach) — Pre-built blocks that consultants deploy and customize at each bank. Faster to market, services-heavy.
+3. Open Core Model — Open-source the block framework, sell enterprise features (governance, compliance, support). Good for adoption, harder to monetize.
+
