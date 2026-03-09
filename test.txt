@@ -1,0 +1,13 @@
+# Bank: Crédit Agricole Paris
+config:
+  legacy_formats: ["CFONB", "MT940"]
+  target_format: "pain.001.001.09"
+  error_handling: "auto_correct"
+  routing_rules:
+    complaints: "dept_service_client"
+    mandate_disputes: "dept_sepa_operations"
+  risk_thresholds:
+    auto_approve: 0.95
+    human_review: 0.70
+  language: "fr"
+  regulator: "ACPR"
