@@ -196,4 +196,53 @@ This positions the idea even more powerfully: you’re not just building AI bloc
 Want me to build a working prototype of one MCP server — say the format converter — that you can demo to your team?​​​​​​​​​​​​​​​​
 
 
+Here’s the interactive comparison across 17 dimensions with honest scoring, covering 5 categories. Click through each category or view all at once. Here’s the summary:
+The Scorecard: MCP 9 vs Traditional 5 vs Depends 1
+But the numbers don’t tell the full story. Let me give you the honest breakdown:
+Where MCP Clearly Wins (9 areas)
+Eliminating duplicate work — This is your core problem. A shared library eliminates maybe 60–70% of duplication because teams still write glue code, orchestration, error handling, and output formatting. MCP tools are complete units — teams invoke them as black boxes and get 90–95% duplication elimination.
+New tool deployment — When you add a function to a shared library, 15 teams must upgrade their dependency. With MCP, new tools are instantly available. Zero downstream action needed.
+Audit trails — Every MCP tool call is automatically logged with who, what, when, and why. For DORA compliance, this is built-in rather than something each team implements (inconsistently).
+Access control — MCP has OAuth 2.1 natively. Your shared library trusts whoever imports it — fine-grained permissions need to be custom-built.
+Schema change absorption — When Oracle renames a table, you update one MCP tool internally. Consumers never know. With a shared library, you publish a new version and 15 teams upgrade.
+Cross-language support — Your PySpark library can’t be called by Java teams without a wrapper. MCP is protocol-level — any language works.
+AI agent compatibility — If CA is adopting AI agents through the AI Factory and CA Generative Search, MCP is the interface they expect.
+Business user access — A business analyst can ask an AI assistant to invoke MCP tools. They can’t import a Python library.
+Where Traditional Clearly Wins (5 areas)
+Debugging — When something breaks, you want stack traces and breakpoints, not agent reasoning logs. Traditional debugging tooling has decades of maturity. MCP debugging is immature.
+Performance — Direct function calls have zero overhead. MCP adds 1–10ms per tool call plus agent reasoning time. For real-time payment processing, this matters.
+Version management — Semantic versioning (v2.3.1) is battle-tested. MCP versioning standards don’t exist yet. For a bank that values stability, this is a real concern.
+Testing — Unit tests, integration tests, contract tests — all mature for shared libraries. Testing how an AI agent will use your MCP tools is an unsolved problem.
+Deployment — A shared library is “publish and forget.” An MCP server is a live service needing 24/7 monitoring, health checks, and SRE investment.
+Maturity — MCP is 16 months old. Shared libraries have decades of proven patterns. No bank runs production MCP servers for financial workflows today.
+The Depends
+Composability — For critical financial workflows (regulatory reports, payment processing), you WANT deterministic explicit chaining that traditional code gives you. For exploratory analysis and ad-hoc queries, MCP’s flexible AI-driven composition is powerful. Use both.
+The Pragmatic Recommendation
+Don’t choose one — layer MCP on top of your existing shared library.
 
+Business Users / AI Agents
+         │
+         ▼
+┌─────────────────────┐
+│   MCP SERVER LAYER   │  ← Discovery, audit, access control, AI interface
+│   (thin wrapper)     │     New teams connect here
+└──────────┬──────────┘
+           │ calls
+           ▼
+┌─────────────────────┐
+│  SHARED LIBRARY      │  ← Your existing common code stays here
+│  (Spark, services)   │     Traditional devs import this directly
+└──────────┬──────────┘
+           │ executes
+           ▼
+┌─────────────────────┐
+│  COMPUTE BACKENDS    │  ← Spark cluster, microservices, LLMs
+│  (unchanged)         │
+└─────────────────────┘
+
+
+Traditional developers who prefer importing a library directly continue doing so. Zero disruption.
+AI agents and new teams connect via MCP for auto-discovery and audit trails.
+Both paths invoke the same underlying Spark jobs and microservices. Your existing common code doesn’t get rewritten — it gets a new front door.
+This is exactly how Microsoft Dynamics 365 works — the ERP business logic is the library, and the MCP server provides a dynamic framework for agents to perform data operations and access business logic, enabling agents to work with data and perform nearly any function available to a user ￼.
+The MCP layer is thin — maybe 50 lines per tool. It adds discovery, audit, and AI compatibility on top of what you already have, without replacing anything.​​​​​​​​​​​​​​​​
