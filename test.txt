@@ -37,3 +37,35 @@ There are three ways to deliver reusable AI blocks:
 2. Accelerator Model (Neurons Lab approach) — Pre-built blocks that consultants deploy and customize at each bank. Faster to market, services-heavy.
 3. Open Core Model — Open-source the block framework, sell enterprise features (governance, compliance, support). Good for adoption, harder to monetize.
 
+MCP Server: "banking-format-converter"
+├── Tools:
+│   ├── detect_format(file) → returns detected format + confidence
+│   ├── convert_format(file, target, error_policy) → converted file
+│   ├── structure_address(unstructured_text, country) → ISO 20022 structured
+│   └── validate_sepa(file) → validation report
+├── Resources:
+│   ├── supported_formats → list of all formats handled
+│   ├── conversion_rules → current EPC rulebook version
+│   └── cfonb_variants → French legacy format specifications
+└── Prompts:
+    └── conversion_report → template for human-readable conversion summary
+
+MCP Server: "banking-regulatory-reporter"  
+├── Tools:
+│   ├── generate_corep(data, period) → COREP report
+│   ├── generate_finrep(data, period) → FINREP report
+│   ├── analyze_circular(pdf) → impact assessment
+│   └── generate_sar(transaction_data) → SAR filing
+└── Resources:
+    └── regulatory_calendar → upcoming deadlines
+
+MCP Server: "banking-document-intelligence"
+├── Tools:
+│   ├── classify_document(file) → type + intent + priority + confidence
+│   ├── extract_entities(file) → customer, product, amounts
+│   ├── route_document(classified_doc) → department + reasoning
+│   └── execute_instruction(doc, action) → confirmation
+└── Resources:
+    └── department_taxonomy → routing rules
+
+
